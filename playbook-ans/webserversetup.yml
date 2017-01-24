@@ -1,0 +1,28 @@
+---
+- hosts: all
+  user: root
+  #sudo: True
+  gather_facts: yes
+  tasks:
+   - name: Installing webserver or httpd
+     yum: name=httpd state=latest
+   - name: Start the web Service
+     service: name=httpd state=restarted
+   - name: Installing curl
+     yum: name=curl state=installed
+   - name: verify the webserver is running or not
+     command: service httpd status
+     register: result
+   - name: creating a index file in webserver location
+     file: path=/var/www/html/index.html state=touch
+   - stat: path=/var/www/html/index.html
+     register: file_path
+   - debug: msg="File exists"
+     when: file_path.stat.exists == true
+   - copy: content="Your content goes here.." dest="/etc/foo.conf"
+     when: file_path.stat.exists == true
+   #- name: this is my challenge to be done by me :P
+   - copy: content="SRE CHALLENGE" dest="/var/www/html/index.html"
+    #command: cd /var/www/html/ && echo "SRE CHALLENGE" >> index.html
+     when: file_path.stat.exists == true
+    #command: echo "SRE CHALLENGE" >> /var/www/html/index.html
